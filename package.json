@@ -1,0 +1,52 @@
+{
+  "name": "html-balancer-stream",
+  "version": "0.0.0",
+  "repository": "github:etler/node-simple-library-template",
+  "license": "MIT",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "files": [
+    "dist",
+    "types"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm run clean && npm run build && npm run lint && npm run test",
+    "prepare": "husky && ts-patch install -s",
+    "clean": "rm -rf dist/ types/",
+    "build": "tsc",
+    "dev": "tsc -w",
+    "lint": "npx eslint",
+    "test": "tsc -p tests && vitest run --config tests/vitest.config.mts",
+    "fix": "npx eslint --fix"
+  },
+  "dependencies": {
+    "htmlparser2": "^10.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "^22.0.0",
+    "eslint": "~9.21.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "~5.2.3",
+    "eslint-plugin-tsdoc": "~0.4.0",
+    "globals": "^16.0.0",
+    "husky": "~9.1.7",
+    "lint-staged": "~15.4.3",
+    "prettier": "~3.5.2",
+    "ts-patch": "~3.3.0",
+    "typescript": "~5.7.3",
+    "typescript-eslint": "^8.25.0",
+    "typescript-transform-paths": "~3.5.3",
+    "vitest": "^3.2.4"
+  }
+}

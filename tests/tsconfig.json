@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "lib": ["ESNext", "DOM.AsyncIterable", "ESNext.AsyncIterable"],
+    "types": ["vitest/globals"],
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["../src/*"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": []
+}
