@@ -1,6 +1,6 @@
 {
   "name": "html-balancer-stream",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "github:etler/node-simple-library-template",
   "license": "MIT",
   "type": "module",
