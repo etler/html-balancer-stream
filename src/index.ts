@@ -100,6 +100,7 @@ function makeParser(enqueue: (chunk: string) => void, options: Required<HtmlBala
       },
     },
     {
+      // Parser options to avoid making unnecessary modifications to the input stream
       lowerCaseAttributeNames: false,
       lowerCaseTags: false,
       recognizeSelfClosing: true,
