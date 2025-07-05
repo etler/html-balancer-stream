@@ -83,6 +83,31 @@ describe.concurrent("HtmlBalancerStream", { timeout: 1000 }, () => {
       await expect(take()).resolves.toEqual(["<br/>"]);
       await expect(finish()).resolves.toEqual([]);
     });
+
+    it("should handle custom self-closing tags", async () => {
+      const { push, take, finish } = getStreamController();
+      push('<test-tag/><br><Wrapper><Custom src="test.jpg"/></Wrapper>');
+      await expect(take()).resolves.toEqual([
+        "<test-tag>",
+        "</test-tag>",
+        "<br/>",
+        "<Wrapper>",
+        '<Custom src="test.jpg">',
+        "</Custom>",
+        "</Wrapper>",
+      ]);
+      await expect(finish()).resolves.toEqual([]);
+    });
+    it("should handle custom self-closing tags in buffered mode", async () => {
+      const { push, take, finish } = getStreamController({ buffer: true });
+      push('<test-tag/><br><Wrapper><Custom src="test.jpg"/></Wrapper>');
+      await expect(take()).resolves.toEqual([
+        "<test-tag></test-tag>",
+        "<br/>",
+        '<Wrapper><Custom src="test.jpg"></Custom></Wrapper>',
+      ]);
+      await expect(finish()).resolves.toEqual([]);
+    });
   });
 
   describe("unclosed tags at various nesting levels", () => {
@@ -270,11 +295,11 @@ describe.concurrent("HtmlBalancerStream", { timeout: 1000 }, () => {
       await expect(finish()).resolves.toEqual([]);
     });
 
-    it("should handle mixed case tag names", async () => {
+    it("should preserve mixed case tag names", async () => {
       const { push, take, finish } = getStreamController();
-      push("<DIV>content</DIV>");
-      await expect(take()).resolves.toEqual(["<div>", "content", "</div>"]);
-      await expect(finish()).resolves.toEqual([]);
+      push("<Div>content</Div><DIV>more");
+      await expect(take()).resolves.toEqual(["<Div>", "content", "</Div>", "<DIV>", "more"]);
+      await expect(finish()).resolves.toEqual(["</DIV>"]);
     });
 
     it("should handle boolean attributes", async () => {

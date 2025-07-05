@@ -69,35 +69,42 @@ function makeParser(enqueue: (chunk: string) => void, options: Required<HtmlBala
       enqueue(htmlNodesToString(buffer.splice(0)));
     }
   };
-  return new Parser({
-    onopentag: (name, attributes) => {
-      unclosed++;
-      buffer.push({ type: "open", name, attributes });
-      // Only output tags if tag buffering is disabled
-      if (!options.buffer) {
-        flush();
-      }
+  return new Parser(
+    {
+      onopentag: (name, attributes) => {
+        unclosed++;
+        buffer.push({ type: "open", name, attributes });
+        // Only output tags if tag buffering is disabled
+        if (!options.buffer) {
+          flush();
+        }
+      },
+      ontext: (text) => {
+        // Add plain text to the buffer
+        buffer.push({ type: "text", text });
+        // Flush the buffer if tag buffering is disabled or if all tags are closed
+        if (!options.buffer || unclosed === 0) {
+          flush();
+        }
+      },
+      // htmlparser2 automatically closes tags in order when needed
+      onclosetag: (name) => {
+        unclosed--;
+        if (!isSelfClosingTag(name)) {
+          buffer.push({ type: "close", name });
+        }
+        // Flush the buffer if tag buffering is disabled or if all tags are closed
+        if (!options.buffer || unclosed === 0) {
+          flush();
+        }
+      },
     },
-    ontext: (text) => {
-      // Add plain text to the buffer
-      buffer.push({ type: "text", text });
-      // Flush the buffer if tag buffering is disabled or if all tags are closed
-      if (!options.buffer || unclosed === 0) {
-        flush();
-      }
+    {
+      lowerCaseAttributeNames: false,
+      lowerCaseTags: false,
+      recognizeSelfClosing: true,
     },
-    // htmlparser2 automatically closes tags in order when needed
-    onclosetag: (name) => {
-      unclosed--;
-      if (!isSelfClosingTag(name)) {
-        buffer.push({ type: "close", name });
-      }
-      // Flush the buffer if tag buffering is disabled or if all tags are closed
-      if (!options.buffer || unclosed === 0) {
-        flush();
-      }
-    },
-  });
+  );
 }
 
 function htmlNodesToString(nodes: HtmlNode[]): string {
