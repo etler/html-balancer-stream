@@ -57,7 +57,8 @@ export function balanceHtmlString(htmlString: string): string {
     },
     { buffer: false },
   );
-  parser.end(htmlString);
+  // Remove any potentally malformed html tags at the end of input
+  parser.end(htmlString.replace(/<[^>]*$/, ""));
   return result;
 }
 
@@ -80,8 +81,10 @@ function makeParser(enqueue: (chunk: string) => void, options: Required<HtmlBala
         }
       },
       ontext: (text) => {
+        // Sanitize raw `<` and `>`
+        const sanitizedText = text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         // Add plain text to the buffer
-        buffer.push({ type: "text", text });
+        buffer.push({ type: "text", text: sanitizedText });
         // Flush the buffer if tag buffering is disabled or if all tags are closed
         if (!options.buffer || unclosed === 0) {
           flush();

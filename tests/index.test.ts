@@ -179,7 +179,7 @@ describe.concurrent("HtmlBalancerStream", { timeout: 1000 }, () => {
     it("should handle malformed opening tag", async () => {
       const { push, take, finish } = getStreamController();
       push("< div>content</div>");
-      await expect(take()).resolves.toEqual(["< div>content"]);
+      await expect(take()).resolves.toEqual(["&lt; div&gt;content"]);
       await expect(finish()).resolves.toEqual([]);
     });
 
@@ -431,7 +431,7 @@ describe.concurrent("HtmlBalancerStream", { timeout: 1000 }, () => {
       await expect(take()).resolves.toEqual([
         "<div>",
         "This ",
-        "< that > other & ",
+        "&lt; that &gt; other & ",
         "<script>",
         " alert('not a real script'); ",
         "</script>",
@@ -535,6 +535,22 @@ describe("balanceHtmlString", () => {
   it("should balance unclosed tags when a parent closes", () => {
     const result = balanceHtmlString("<div><p>content</div>");
     expect(result).toBe("<div><p>content</p></div>");
+  });
+
+  it("should discard malformed tags at the end of input", () => {
+    const baseHtml = `<div><p>content<img src="http://example.com/image.jpg"`;
+    for (let index = baseHtml.indexOf("<img") + 1; index < baseHtml.length; index++) {
+      const result = balanceHtmlString(baseHtml.slice(0, index));
+      expect(result).toBe("<div><p>content</p></div>");
+    }
+  });
+
+  it("should discard malformed tags at the end of input", () => {
+    const baseHtml = `<div><p>content<img src="http://example.com/image.jpg"`;
+    for (let index = baseHtml.indexOf("<img") + 1; index < baseHtml.length; index++) {
+      const result = balanceHtmlString(baseHtml.slice(0, index));
+      expect(result).toBe("<div><p>content</p></div>");
+    }
   });
 });
 
