@@ -81,10 +81,8 @@ function makeParser(enqueue: (chunk: string) => void, options: Required<HtmlBala
         }
       },
       ontext: (text) => {
-        // Sanitize raw `<` and `>`
-        const sanitizedText = text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         // Add plain text to the buffer
-        buffer.push({ type: "text", text: sanitizedText });
+        buffer.push({ type: "text", text: sanitizeText(text) });
         // Flush the buffer if tag buffering is disabled or if all tags are closed
         if (!options.buffer || unclosed === 0) {
           flush();
@@ -111,13 +109,24 @@ function makeParser(enqueue: (chunk: string) => void, options: Required<HtmlBala
   );
 }
 
+// Sanitize reserved characters with HTML entities
+function sanitizeText(text: string) {
+  return text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
+// Sanitize attribute reserved characters with HTML entities
+function sanitizeAttribute(text: string) {
+  return text.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;");
+}
+
+// Convert nodes to HTML strings
 function htmlNodesToString(nodes: HtmlNode[]): string {
   return nodes
     .map((node): string => {
       switch (node.type) {
         case "open": {
           const attributeStrings = Object.entries(node.attributes).map(
-            ([key, value]) => `${key}=${JSON.stringify(value)}`,
+            ([key, value]) => `${key}=${JSON.stringify(sanitizeAttribute(value))}`,
           );
           const closeTag = isSelfClosingTag(node.name) ? "/" : "";
           return `<${[node.name, ...attributeStrings].join(" ")}${closeTag}>`;
@@ -126,7 +135,7 @@ function htmlNodesToString(nodes: HtmlNode[]): string {
           return `</${node.name}>`;
         }
         default: {
-          return node.text;
+          return sanitizeText(node.text);
         }
       }
     })

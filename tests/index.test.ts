@@ -404,6 +404,21 @@ describe.concurrent("HtmlBalancerStream", { timeout: 1000 }, () => {
       await expect(finish()).resolves.toEqual([]);
     });
 
+    it("should handle html entities", async () => {
+      const { push, take, finish } = getStreamController();
+      push(`<spec name="Dimensions" value="14.84&quot;L &lt; 11.3&quot;W &gt; 10.39&quot;H">1&lt;2&gt;0</spec>`);
+      await expect(take()).resolves.toEqual([
+        `<spec name="Dimensions" value="14.84&quot;L &lt; 11.3&quot;W &gt; 10.39&quot;H">`,
+        "1",
+        "&lt;",
+        "2",
+        "&gt;",
+        "0",
+        "</spec>",
+      ]);
+      await expect(finish()).resolves.toEqual([]);
+    });
+
     it("should handle extremely fragmented input", async () => {
       const { push, finish } = getStreamController();
       const html = '<div class="test" id="example">Hello <span>world</span>!</div>';
