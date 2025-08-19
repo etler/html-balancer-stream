@@ -142,7 +142,7 @@ function htmlNodesToString(nodes: HtmlNode[]): string {
     .join("");
 }
 
-const selfClosingTags = [
+const selfClosingTags = new Set([
   "area",
   "base",
   "br",
@@ -157,8 +157,8 @@ const selfClosingTags = [
   "source",
   "track",
   "wbr",
-];
+]);
 
 function isSelfClosingTag(tag: string): boolean {
-  return selfClosingTags.includes(tag);
+  return selfClosingTags.has(tag);
 }
