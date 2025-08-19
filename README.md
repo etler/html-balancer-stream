@@ -67,4 +67,7 @@ function balanceHtmlString(
 
 ## License
 
-MIT
+[MIT][license] © [Tim Etler][author]
+
+[license]: LICENSE.md
+[author]: https://github.com/etler
