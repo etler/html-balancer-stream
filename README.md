@@ -33,6 +33,8 @@ Unclosed tags will be automatically balanced when the stream ends. Unclosed chil
 
 ### `HtmlBalancerStream`
 
+Transform stream class for buffering and balancing an HTML input stream.
+
 ```typescript
 class HtmlBalancerStream extends TransformStream<string, string> {
   constructor(options?: HtmlBalancerStreamOptions);
@@ -54,6 +56,8 @@ Incomplete HTML tags will always be buffered until they are fully closed or conf
 Text content will immediately stream in chunks as they are received.
 
 ### `balanceHtmlString`
+
+Non streaming utility for normalizing and balancing an HTML string. Useful for normalizing partial HTML strings from an in progress HTML stream for rendering streaming content.
 
 ```typescript
 function balanceHtmlString(
